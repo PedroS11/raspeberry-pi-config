@@ -22,3 +22,7 @@ Can be found [here](./docker.md).
 ## Git configuration
 
 Can be found [here](./git.md).
+
+## Home Assistant configuration
+
+Can be found [here](./home-assistant.md).
