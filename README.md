@@ -7,6 +7,7 @@ On RaspberryPi Imager
 - Enable SSH
 - Select your WIFI network
 
+Access your router and consider setting a static IP address to you raspberry so it doesn't change every time your router reboots.
 
 ## Enable VNC access
 
@@ -26,3 +27,9 @@ Can be found [here](./git.md).
 ## Home Assistant configuration
 
 Can be found [here](./home-assistant.md).
+
+## USB Hard drive and Samba
+
+The steps to mount the hard drive can be found [here](./mount-hardrive.md).
+
+Then, the steps to setup sambda can be found [here](./samba.md).
