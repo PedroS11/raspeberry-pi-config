@@ -12,7 +12,7 @@ With filename like "~/.ssh/github"
 
 > eval "$(ssh-agent -s)"
 
-ssh-add ~/.ssh/github
+> ssh-add ~/.ssh/github
 
 ## Copy SSH pub key
 
