@@ -1,4 +1,4 @@
-# Backup PI Image to External HDD + Google Drive
+# Backup Documents folder to External HDD + Google Drive
 
 1. Install rclone
 > sudo apt update
@@ -36,15 +36,16 @@ You now have a remote called `gdrive`.
 # -----------------------------
 # Configuration
 # -----------------------------
-BACKUP_MOUNT_PATH="/mnt/usb1"            # Mount path
-BACKUP_DIR="$BACKUP_MOUNT_PATH/pi_backups"        # Local HDD backup folder
-REMOTE="gdriveimage:/pi_image_backup"    # Google Drive folder via rclone
-MAX_LOCAL_BACKUPS=2                       # Number of local backups to keep
-MAX_DRIVE_BACKUPS=2                       # Number of backups to keep on Google Drive
+BACKUP_MOUNT_PATH="/mnt/usb1"
+BACKUP_DIR="$BACKUP_MOUNT_PATH/doc_backups"     # Local HDD backup folder
+REMOTE="gdriveimage:/pi_documents_backup"          # Google Drive folder via rclone
+SOURCE_FOLDER="/home/pi/Documents"             # Folder to backup
+MAX_LOCAL_BACKUPS=2                             # Number of local backups to keep
+MAX_DRIVE_BACKUPS=2                             # Number of backups to keep on Google Drive
 LOGS_FOLDER="$BACKUP_DIR/logs"
 LOG_FILE="$LOGS_FOLDER/backup.log"
 DATE=$(date +%Y-%m-%d)
-IMAGE_NAME="pi_backup_$DATE.img.gz"
+ARCHIVE_NAME="Documents_backup_$DATE.tar.gz"
 
 # -----------------------------
 # Logging function
@@ -57,21 +58,29 @@ log() {
 # Create Logs folder if not exists
 # -----------------------------
 mkdir -p "$LOGS_FOLDER"
+mkdir -p "$BACKUP_DIR"
 
 # -----------------------------
-# Check if HDD is mounted
+# Check if HDD is mounted and writable
 # -----------------------------
-if ! mount | grep "$BACKUP_MOUNT_PATH"; then
+if ! mount | grep "$BACKUP_MOUNT_PATH" >/dev/null; then
     log "ERROR: HDD not mounted at $BACKUP_MOUNT_PATH. Backup aborted."
     exit 1
 fi
 
+if ! touch "$BACKUP_DIR/.backup_test" 2>/dev/null; then
+    log "ERROR: Backup folder not writable: $BACKUP_DIR"
+    exit 1
+else
+    rm "$BACKUP_DIR/.backup_test"
+fi
+
 # -----------------------------
-# Start backup
+# Start backup (compress Documents folder)
 # -----------------------------
-log "Starting backup: $IMAGE_NAME"
-if sudo dd if=/dev/nvme0n1p1 bs=4M status=progress | gzip > "$BACKUP_DIR/$IMAGE_NAME"; then
-    log "Backup completed successfully: $IMAGE_NAME"
+log "Starting backup of $SOURCE_FOLDER → $ARCHIVE_NAME"
+if sudo tar -czf "$BACKUP_DIR/$ARCHIVE_NAME" -C "$(dirname "$SOURCE_FOLDER")" "$(basename "$SOURCE_FOLDER")"; then
+    log "Backup completed successfully: $ARCHIVE_NAME"
 else
     log "ERROR: Backup failed!"
     exit 1
@@ -82,23 +91,21 @@ fi
 # -----------------------------
 cd "$BACKUP_DIR" || exit
 log "Cleaning up old local backups, keeping last $MAX_LOCAL_BACKUPS"
-ls -1t pi_backup_*.img.gz | tail -n +$((MAX_LOCAL_BACKUPS+1)) | xargs -r rm --
+ls -1t Documents_backup_*.tar.gz | tail -n +$((MAX_LOCAL_BACKUPS+1)) | xargs -r rm --
 log "Old local backups cleaned up."
 
 # -----------------------------
 # Upload to Google Drive
 # -----------------------------
-log "Uploading $IMAGE_NAME to Google Drive..."
-if rclone copy "$BACKUP_DIR/$IMAGE_NAME" "$REMOTE" --log-file="$LOGS_FOLDER/gdrive_upload.log" --log-level INFO; then
+log "Uploading $ARCHIVE_NAME to Google Drive..."
+if rclone copy "$BACKUP_DIR/$ARCHIVE_NAME" "$REMOTE" --log-file="$LOGS_FOLDER/gdrive_upload.log" --log-level INFO; then
     log "Upload successful."
 
     # -----------------------------
     # Keep only last $MAX_DRIVE_BACKUPS backups on Drive
     # -----------------------------
     log "Cleaning old backups on Google Drive, keeping last $MAX_DRIVE_BACKUPS..."
-
-    # List files rclone can see (created by this app)
-    FILES=$(rclone lsf --files-only "$REMOTE" --log-level INFO)
+    FILES=$(rclone lsf --files-only "$REMOTE")
     TOTAL_FILES=$(echo "$FILES" | wc -l)
 
     if [ "$TOTAL_FILES" -gt "$MAX_DRIVE_BACKUPS" ]; then
@@ -120,6 +127,7 @@ else
 fi
 
 log "Backup script finished."
+
 ```
 
 Where `/mnt/usb1` is the mount path to your HDD and `/dev/nvme0n1p1` is the mount path to your SD Card/Nvme used for booting. The HDD should be always automatically mounted for this to work, that part was already done in [Mount Hardrive](./mount-hardrive.md).
@@ -137,9 +145,9 @@ Edit the crontab:
 > crontab -e
 
 
-Add the line to run every Sunday at 2 AM:
+Add the line to run every Sunday at 4 AM:
 
-> 0 2 * * 0 /home/pi/backup_pi.sh
+> 0 4 * * 0 /home/pi/backup_pi.sh
 
 
 ## Troubleshoot

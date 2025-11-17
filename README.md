@@ -38,6 +38,7 @@ Then, the steps to setup sambda can be found [here](./samba.md).
 
 All the steps can be found [here](./vpn-wireguard.md).
 
-## Backup Pi images to HDD + Google drive
+## Backup Pi images/folders to HDD + Google drive
 
-All the steps can be found [here](./image-backups.md).
+All the steps to backup Pi images can be found [here](./image-backups.md).
+For the Documents folder (for example) can be found [here](./documents-backups.md).
