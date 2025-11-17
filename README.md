@@ -37,3 +37,7 @@ Then, the steps to setup sambda can be found [here](./samba.md).
 ## Create remove access with DuckDNS + Wireguard
 
 All the steps can be found [here](./vpn-wireguard.md).
+
+## Backup Pi images to HDD + Google drive
+
+All the steps can be found [here](./image-backups.md).
