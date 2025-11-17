@@ -18,6 +18,19 @@ With filename like "~/.ssh/github"
 
 > cat ~/.ssh/github.pub
 
+## Persiste pub key in SSH agent
+
+Edit ~/.ssh/config:
+
+> nano ~/.ssh/config
+
+Add:
+
+```
+Host github.com
+    AddKeysToAgent yes
+    IdentityFile ~/.ssh/github
+```
 
 ## Add the Key to GitHub
 Now we need to add your public key to your GitHub account:
