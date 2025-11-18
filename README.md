@@ -41,4 +41,5 @@ All the steps can be found [here](./vpn-wireguard.md).
 ## Backup Pi images/folders to HDD + Google drive
 
 All the steps to backup Pi images can be found [here](./image-backups.md).
+
 For the Documents folder (for example) can be found [here](./documents-backups.md).
