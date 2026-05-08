@@ -43,3 +43,7 @@ All the steps can be found [here](./vpn-wireguard.md).
 All the steps to backup Pi images can be found [here](./image-backups.md).
 
 For the Documents folder (for example) can be found [here](./documents-backups.md).
+
+## Backup ICloude photos and videos
+
+All the steps can be found [here](https://github.com/PedroS11/raspeberry-pi-config/blob/main/icloud-photos-backup.md).
