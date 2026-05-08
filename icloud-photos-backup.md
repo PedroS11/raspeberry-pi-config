@@ -219,6 +219,13 @@ You can check the logs with:
 docker compose logs
 ```
 
+And you should get something like this
+
+<img width="692" height="1228" alt="image" src="https://github.com/user-attachments/assets/700dd69a-1e03-47aa-8c26-bf54c4183edd" />
+
+\
+Be aware the log line where you can see the username that you will require for re authenticating via Telgram. Whatever is after `Sync user: ` will be username you will use.
+
 ---
 
 ## Re-Authentication Process
