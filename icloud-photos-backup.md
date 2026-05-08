@@ -232,9 +232,9 @@ Be aware the log line where you can see the username that you will require for r
 
 ### Using Telegram
 
-If you configured Telegram integration, you should see in the logs that a `user` was created.
+If you configured Telegram integration, you should see in the logs the username that was created.
 
-In your Telegram bot chat:
+Assuming it was named `user`, in your Telegram bot chat:
 
 1. Send:
 
