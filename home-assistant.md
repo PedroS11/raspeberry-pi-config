@@ -92,3 +92,16 @@ If you are already signed in, you can skip this part.
 Now, go checkout the configuration options.
 Don't forget to setup a backup process.
 </details>
+
+## VPN access only
+
+If you want to not expose the HA and only be available via VPN following these [steps](https://github.com/PedroS11/raspeberry-pi-config/blob/main/vpn-wireguard.md), you need
+to update config/configuration.yml with the wireguard-easy subnet
+
+```
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 10.8.0.0/24  # The default wg-easy subnet
+    ... other ranges you have, like your own subnet
+```
