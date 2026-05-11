@@ -34,48 +34,7 @@ YOUR_DOMAIN needs to be just the domain, not the full url YOUR_DOMAIN.duckdns.or
 
 You should see OK inside ~/duckdns/duck.log.
 
-
-## Configure Wireguard (using Docker)
-
-1. Create a docker-compose file with
-
-```
-services:
-  wireguard:
-    image: lscr.io/linuxserver/wireguard:latest
-    container_name: wireguard
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SERVERURL=myrasppi.duckdns.org     # your DuckDNS domain goes HERE
-      - SERVERPORT=51820
-      - PEERS=peer_name1,peer_name2                            # how many client configs to generate
-      - PEERDNS=1.1.1.1
-      - INTERNAL_SUBNET=10.8.0.0
-    volumes:
-      - ./config:/config
-      - /lib/modules:/lib/modules
-    ports:
-      - 51820:51820/udp
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv4.ip_forward=1
-    restart: unless-stopped
-```
-
-2. Start the container
-
-> docker compose up -d
-
-3. Get the QR Codes for each peer by getting the logs
-
-> docker compose logs
-
-4. Port Forwarding
+## Configure Port Forwarding
 
 On your router, forward:
 
@@ -117,7 +76,7 @@ Service name: something like “WireGuard” or “WG”
 
 Protocol: UDP (WireGuard uses UDP)
 
-Device / LAN IP: the local IP of your Raspberry Pi (e.g., 192.168.1.100)
+Device / LAN IP: the local IP of your Raspberry Pi (e.g., 192.168.1.100). One thing that is worth is to give a static IP to your PI so you can use it here
 
 External (Public) Port: 51820 (or whatever port WireGuard listens on)
 
@@ -136,6 +95,49 @@ Use a tool like canyouseeme.org or portchecker.co to check if the port is open.
 Make sure your Raspberry Pi is running WireGuard while testing.
 </details>
 
-5. Download the Wireguard app
 
-6. Add a tunnel, scan your QR code and you are all setup with it.
+## Configure Wireguard (using Docker)
+
+1. Create a docker-compose file with
+
+```
+volumes:
+  etc_wireguard:
+
+services:
+  wg-easy:
+    environment:
+      - PORT=51821
+      - INSECURE=true
+      - WG_HOST=YOURDOMAIN.duckdns.org
+      - WG_DEFAULT_DNS=1.1.1.1
+    
+    privileged: true
+
+    image: ghcr.io/wg-easy/wg-easy:15
+    container_name: wg-easy
+    volumes:
+      - ./etc_wireguard:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      net.ipv4.ip_forward: "1"
+      net.ipv4.conf.all.src_valid_mark: "1"
+
+```
+
+2. Start the container
+
+> docker compose up -d
+
+3. Log in, configure an account with your duckdns url
+
+4. Download the Wireguard app on your mobile
+
+5. Add a client by scanning your QR code and you are all setup with it.
