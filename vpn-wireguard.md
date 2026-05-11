@@ -1,4 +1,4 @@
-# Configure DuckDNS with Wireguard
+# Configure DuckDNS/Cloudflare subdomain with Wireguard
 
 ## Configure DuckDNS
 
@@ -33,6 +33,47 @@ YOUR_DOMAIN needs to be just the domain, not the full url YOUR_DOMAIN.duckdns.or
 
 
 You should see OK inside ~/duckdns/duck.log.
+
+## Configure Cloudflare subdomain
+
+Another option is, if you have already a Cloudflare, create a subdomain like `vpn` in the DNS tabe. Create a A record and put your public IP without Proxy Status.
+
+### Automatic update of the IP
+
+1. On Cloudflare API Tokens by click [here](https://dash.cloudflare.com/profile/api-tokens?utm_source=chatgpt.com).
+
+Permissions:
+
+> Zone → DNS → Edit
+
+Zone Resources:
+
+> Include → Specific zone → your domain
+
+Example:
+
+example.com
+
+Save the token.
+
+2. Create a docker container that every 5mins updates the IP if changed.
+
+```
+services:
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - CLOUDFLARE_API_TOKEN=THE_TOKEN
+      - DOMAINS=SUBDOMAIN.DOMAIN # <- like vpn.example.com
+      - PROXIED=false
+      - IP6_PROVIDER=none
+```
+
+3. And start it with
+> docker compose up -d
 
 ## Configure Port Forwarding
 
